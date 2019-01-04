@@ -24,6 +24,12 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	public SequentList(int capacity) {
 		array = (T[]) new Object[capacity];
 	}
+	
+	@SuppressWarnings("unchecked")
+	public SequentList(int capacity, int ensurePercent) {
+		array = (T[]) new Object[capacity];
+		this.ensurePercent = ensurePercent;
+	}
 
 	/**
 	 * 获得当前尺寸
@@ -119,12 +125,33 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 		size--;
 		return data;
 	}
+	
+	private T delete(Object data) {
+		return delete(data, 0, size);
+	}
+	
+	private T delete(Object data, int start, int end) {
+		if(data != null) {
+			for(int i = start; i < end; i++) {
+				if(data.equals(array[i])) {
+					return delete(i);
+				}
+			}			
+		} else {
+			for(int i = start; i < end; i++) {
+				if(array[i] == null) {
+					return delete(i);
+				}
+			}
+		}
+		return null;
+	}
 
 	@SuppressWarnings("unchecked")
 	private void batchDelete(int start, int end, T[] data) {
 		boolean[] status = new boolean[size];
 		for(int i = 0; i < data.length; i++) {
-			int index = indexOf(data[i], start, end);
+			int index = indexOfWithoutCheck(data[i], start, end);
 			if(index != -1) {
 				status[index] = true;
 			}
@@ -192,12 +219,7 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 
 	@Override
 	public boolean remove(Object data) {
-		int position = indexOf(data);
-		if(position == -1) {
-			return false;
-		}
-		delete(position);
-		return true;
+		return delete(data) != null;
 	}
 
 	@Override
@@ -231,16 +253,15 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 				if(data.equals(array[i])) {
 					return i;
 				}
-			}
-			return -1;
+			}			
 		} else {
 			for(int i = start; i < end; i++) {
 				if(array[i] == null) {
 					return i;
 				}
 			}
-			return -1;
 		}
+		return -1;
 	}
 
 	@Override
@@ -269,15 +290,14 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 					return i;
 				}
 			}
-			return -1;
 		} else {
 			for(int i = end - 1; i >= start; i--) {
 				if(array[i] == null) {
 					return i;
 				}
 			}
-			return -1;
 		}
+		return -1;
 	}
 
 	private boolean ensureCapacity(int size) {
