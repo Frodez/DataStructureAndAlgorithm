@@ -1,6 +1,5 @@
 package datastructure;
 
-import java.beans.DefaultPersistenceDelegate;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Queue;
@@ -10,6 +9,10 @@ public class ArrayQueue<T> implements Queue<T> {
 	private static final int BASE_CAPACITY = 10;
 
 	private int size = 0;
+	
+	private int start = 0;
+	
+	private int end = 0;
 	
 	private T[] array;
 	
@@ -27,119 +30,55 @@ public class ArrayQueue<T> implements Queue<T> {
 	public int size() {
 		return size;
 	}
+	
+	public int capacity() {
+		return array.length;
+	}
+	
+	public boolean isFull() {
+		return size == array.length;
+	}
+	
+	/**
+	 * 对新增做合法性判断
+	 */
+	private void checkAdd() {
+		if(size == array.length) {
+			throw new IndexOutOfBoundsException("queue is full!");
+		}
+	}
+	
+	/**
+	 * 获取队列的下标
+	 * @return
+	 */
+	private int getEnd() {
+		if(start < end || (start == end && isEmpty())) {
+			return end;
+		}
+		return end + array.length;
+	}
 
 	@Override
 	public boolean isEmpty() {
 		return size == 0;
 	}
-	
-	private void insert(int position, T data) {
-		for(int i = size - 1; i >= position; i--) {
-			array[i + 1] = array[i];
-		}
-		array[position] = data;
-		size++;
-	}
-	
-	private void batchInsert(int position, T[] data) {
-		for(int i = size - 1; i >= position; i--) {
-			array[i + data.length] = array[i];
-		}
-		for(int i = position; i < size; i++) {
-			array[i] = data[i - position];
-		}
-		size = size + data.length;
-	}
-
-	private T delete(int position) {
-		T data = array[position];
-		for(int i = position; i < size - 1; i++) {
-			array[i] = array[i + 1];
-		}
-		size--;
-		return data;
-	}
-	
-	private T delete(Object data) {
-		return delete(data, 0, size);
-	}
-	
-	private T delete(Object data, int start, int end) {
-		if(data != null) {
-			for(int i = start; i < end; i++) {
-				if(data.equals(array[i])) {
-					return delete(i);
-				}
-			}			
-		} else {
-			for(int i = start; i < end; i++) {
-				if(array[i] == null) {
-					return delete(i);
-				}
-			}
-		}
-		return null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private void batchDelete(int start, int end, T[] data) {
-		boolean[] status = new boolean[size];
-		for(int i = 0; i < data.length; i++) {
-			int index = indexOfWithoutCheck(data[i], start, end);
-			if(index != -1) {
-				status[index] = true;
-			}
-		}
-		T[] newArray = (T[]) new Object[array.length];
-		int count = 0;
-		for(int i = 0; i < size; i++) {
-			if(status[i] == false) {
-				newArray[count] = array[i];
-				count++;
-			}
-		}
-		size = count;
-		array = newArray;
-	}
-
-	private T update(int position, T data) {
-		T result = array[position];
-		array[position] = data;
-		return result;
-	}
-	
-	private int indexOfWithoutCheck(Object data, int start, int end) {
-		if(data != null) {
-			for(int i = start; i < end; i++) {
-				if(data.equals(array[i])) {
-					return i;
-				}
-			}			
-		} else {
-			for(int i = start; i < end; i++) {
-				if(array[i] == null) {
-					return i;
-				}
-			}
-		}
-		return -1;
-	}
 
 	@Override
 	public boolean contains(Object data) {
 		if(data != null) {
-			for(int i = 0; i < size; i++) {
-				if(data.equals(array[i])) {
+			for(int i = start; i < getEnd(); i++) {
+				if(data.equals(array[i < array.length ? i : i - array.length])) {
 					return true;
-				}
+				}			
 			}
 		} else {
-			for(int i = 0; i < size; i++) {
-				if(array[i] == null) {
+			for(int i = start; i < getEnd(); i++) {
+				if(array[i < array.length ? i : i - array.length] == null) {
 					return true;
-				}
+				}			
 			}
-		}
+		}		
 		return false;
 	}
 
@@ -152,8 +91,8 @@ public class ArrayQueue<T> implements Queue<T> {
 	@Override
 	public Object[] toArray() {
 		Object[] result = new Object[size];
-		for(int i = 0; i < size; i++) {
-			result[i] = array[i];
+		for(int i = start; i < getEnd(); i++) {
+			result[i] = array[i < array.length ? i : i - array.length];			
 		}
 		return result;
 	}
@@ -166,68 +105,54 @@ public class ArrayQueue<T> implements Queue<T> {
 		}
 		for(int i = 0; i < a.length; i++) {
 			if(i < size) {
-				a[i] = (T) array[i];
+				int index = i + start;
+				a[i] = (T) array[index < array.length ? index : index - array.length];
 			} else {
 				a[i] = null;
 			}
 		}
-		return null;
+		return a;
 	}
 
 	@Override
 	public boolean remove(Object data) {
-		return delete(data) != null;
-	}
-
-	@Override
-	public boolean containsAll(Collection<?> collection) {
-		Iterator<?> iterator = collection.iterator();
-		while (iterator.hasNext()) {
-			if(indexOfWithoutCheck(iterator.next(), 0, size) == -1) {
-				return false;
-			}
+		if(data == null) {
+			
 		}
-		return true;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public boolean addAll(Collection<? extends T> collection) {
-		if(collection.size() > array.length - size) {
-			throw new IllegalStateException();
+		for(int i = start; i < getEnd(); i++) {
+			//array[i < array.length ? i : i - array.length];			
 		}
-		batchInsert(size, (T[]) collection.toArray());
-		return true;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public boolean removeAll(Collection<?> collection) {
-		batchDelete(0, size, (T[]) collection.toArray());
 		return false;
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public boolean retainAll(Collection<?> collection) {
-		T[] newArray = (T[]) new Object[array.length];
-		int count = 0;
-		for(int i = 0; i < size; i++) {
-			if(collection.contains(array[i])) {
-				newArray[count] = array[i];
-				count++;
-			}
-		}
-		array = newArray;
-		size = count;
+	public boolean containsAll(Collection<?> c) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	public boolean addAll(Collection<? extends T> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
 	public void clear() {
-		array = (T[]) new Object[] {};
-		size = 0;
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
