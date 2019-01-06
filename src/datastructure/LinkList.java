@@ -1,5 +1,6 @@
 package datastructure;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -11,7 +12,10 @@ import java.util.function.Function;
  * @author Frodez
  * @date 2018-12-30
  */
-public class LinkList<T> implements Iterable<T>, List<T> {
+public class LinkList<T extends Comparable<T>>
+	implements Serializable, Iterable<T>, List<T>, Sortable<T> {
+
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 链表节点
@@ -104,7 +108,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	 * @date 2018-12-30
 	 */
 	private void checkLegal(int index) {
-		if(index < 0 || index >= size) {
+		if (index < 0 || index >= size) {
 			throw new IndexOutOfBoundsException();
 		}
 	}
@@ -115,13 +119,13 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	 * @date 2018-12-30
 	 */
 	private void checkInterval(int start, int end) {
-		if(isNotLegal(start)) {
+		if (isNotLegal(start)) {
 			throw new IndexOutOfBoundsException();
 		}
-		if(isNotLegal(end - 1)) {
+		if (isNotLegal(end - 1)) {
 			throw new IndexOutOfBoundsException();
 		}
-		if(end < start) {
+		if (end < start) {
 			throw new RuntimeException();
 		}
 	}
@@ -152,18 +156,18 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	 * @date 2018-12-30
 	 */
 	private Node<T> select(int position) {
-		if(size == 0) {
+		if (size == 0) {
 			return null;
 		}
-		if(position <= size / 2) {
+		if (position <= size / 2) {
 			Node<T> node = startNode.next;
-			for(int i = 0; i < position; i++) {
+			for (int i = 0; i < position; i++) {
 				node = node.next;
 			}
 			return node;
 		} else {
 			Node<T> node = endNode;
-			for(int i = position; i < size; i++) {
+			for (int i = position; i < size; i++) {
 				node = node.prev;
 			}
 			return node;
@@ -189,7 +193,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	 * @date 2018-12-31
 	 */
 	private void batchInsert(T[] data, Node<T> prev, Node<T> next) {
-		for(int i = 0; i < data.length; i++) {
+		for (int i = 0; i < data.length; i++) {
 			Node<T> node = new Node<>(data[i], prev, null);
 			prev.next = node;
 			prev = node;
@@ -250,7 +254,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	 */
 	public void addAll(int position, T[] data) {
 		Node<T> node = null;
-		if(position == size) {
+		if (position == size) {
 			node = endNode;
 		} else {
 			checkLegal(position);
@@ -267,7 +271,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	@Override
 	public void add(int position, T data) {
 		Node<T> node = null;
-		if(position == size) {
+		if (position == size) {
 			node = endNode;
 		} else {
 			checkLegal(position);
@@ -343,7 +347,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	public int indexOfSafely(Object data, int start, int end) {
 		start = start < 0 ? 0 : start;
 		end = end > size ? size : end;
-		if(start >= end) {
+		if (start >= end) {
 			throw new RuntimeException();
 		}
 		return indexOfWithoutCheck(data, start, end);
@@ -359,17 +363,17 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	 */
 	private int indexOfWithoutCheck(Object data, int start, int end) {
 		Node<T> node = select(start);
-		if(data != null) {
-			for(int i = start; i < end; i++) {
-				if(data.equals(node.data)) {
+		if (data != null) {
+			for (int i = start; i < end; i++) {
+				if (data.equals(node.data)) {
 					return i;
 				}
 				node = node.next;
 			}
 			return -1;
 		} else {
-			for(int i = start; i < end; i++) {
-				if(node.data == null) {
+			for (int i = start; i < end; i++) {
+				if (node.data == null) {
 					return i;
 				}
 				node = node.next;
@@ -412,7 +416,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	public int lastIndexOfSafely(Object data, int start, int end) {
 		start = start < 0 ? 0 : start;
 		end = end > size ? size : end;
-		if(start >= end) {
+		if (start >= end) {
 			throw new RuntimeException();
 		}
 		return lastIndexOfWithoutCheck(data, start, end);
@@ -428,17 +432,17 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	 */
 	private int lastIndexOfWithoutCheck(Object data, int start, int end) {
 		Node<T> node = select(end - 1);
-		if(data != null) {
-			for(int i = start; i < end; i++) {
-				if(data.equals(node.data)) {
+		if (data != null) {
+			for (int i = start; i < end; i++) {
+				if (data.equals(node.data)) {
 					return i;
 				}
 				node = node.prev;
 			}
 			return -1;
 		} else {
-			for(int i = start; i < end; i++) {
-				if(node.data == null) {
+			for (int i = start; i < end; i++) {
+				if (node.data == null) {
 					return i;
 				}
 				node = node.prev;
@@ -460,7 +464,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 		LinkList<T> list = new LinkList<>();
 		Node<T> startNode = select(start);
 		Node<T> endNode = select(end - 1);
-		//jdk会自己收集被裁剪的元素
+		// jdk会自己收集被裁剪的元素
 		startNode.prev.next = null;
 		endNode.next.prev = null;
 		list.startNode.next = startNode;
@@ -488,14 +492,14 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[");
 		Node<T> node = startNode;
-		for(int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			node = node.next;
-			if(node.data == null) {
+			if (node.data == null) {
 				sb.append(defaultString);
 			} else {
 				sb.append(node.data.toString());
 			}
-			if(i != size - 1) {
+			if (i != size - 1) {
 				sb.append(", ");
 			}
 		}
@@ -521,14 +525,14 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[");
 		Node<T> node = startNode;
-		for(int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			node = node.next;
-			if(node.data == null) {
+			if (node.data == null) {
 				sb.append(defaultString);
 			} else {
 				sb.append(function.apply(node.data));
 			}
-			if(i != size - 1) {
+			if (i != size - 1) {
 				sb.append(", ");
 			}
 		}
@@ -537,13 +541,13 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	}
 
 	public void reserse() {
-		if(size == 0 || size == 1) {
+		if (size == 0 || size == 1) {
 			return;
 		}
 		Node<T> target = startNode;
 		Node<T> node = endNode.prev;
-		for(int i = 0; i < size - 1; i++) {
-			//将node转移到target后,将node.prev转移到this.endNode前,然后将node置为node.prev,将target置为target.next
+		for (int i = 0; i < size - 1; i++) {
+			// 将node转移到target后,将node.prev转移到this.endNode前,然后将node置为node.prev,将target置为target.next
 			Node<T> temp = node.prev;
 			node.prev = target;
 			target.next = node;
@@ -552,7 +556,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 			target = target.next;
 			node = temp;
 		}
-		//将最后的两个元素连接起来
+		// 将最后的两个元素连接起来
 		target.next = node;
 		node.prev = target;
 	}
@@ -564,12 +568,12 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 
 	@Override
 	public Object[] toArray() {
-		if(size == 0) {
+		if (size == 0) {
 			return new Object[] {};
 		}
 		Object[] result = new Object[size];
 		Node<T> node = startNode;
-		for(int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			node = node.next;
 			result[i] = node.data;
 		}
@@ -579,13 +583,13 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	@Override
 	@SuppressWarnings({ "unchecked", "hiding" })
 	public <T> T[] toArray(T[] array) {
-		if(array == null) {
+		if (array == null) {
 			throw new NullPointerException();
 		}
 		Node<T> node = (Node<T>) startNode;
-		for(int i = 0; i < array.length; i++) {
+		for (int i = 0; i < array.length; i++) {
 			node = node.next;
-			if(i < size) {
+			if (i < size) {
 				array[i] = node.data;
 			} else {
 				array[i] = null;
@@ -596,13 +600,13 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 
 	@Override
 	public boolean remove(Object data) {
-		if(data == null) {
+		if (data == null) {
 			throw new NullPointerException();
 		}
 		Node<T> node = endNode;
-		for(int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			node = node.prev;
-			if(data.equals(node.data)) {
+			if (data.equals(node.data)) {
 				delete(node);
 				return true;
 			}
@@ -614,7 +618,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	public boolean containsAll(Collection<?> collection) {
 		Iterator<?> iterator = collection.iterator();
 		while (iterator.hasNext()) {
-			if(indexOf(iterator.next()) == -1) {
+			if (indexOf(iterator.next()) == -1) {
 				return false;
 			}
 		}
@@ -642,13 +646,13 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 
 	@Override
 	public boolean removeAll(Collection<?> collection) {
-		if(collection == null || collection.isEmpty()) {
+		if (collection == null || collection.isEmpty()) {
 			return true;
 		}
 		Node<T> node = startNode;
-		for(int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			node = node.next;
-			if(collection.contains(node.data)) {
+			if (collection.contains(node.data)) {
 				delete(node);
 			}
 		}
@@ -657,14 +661,14 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 
 	@Override
 	public boolean retainAll(Collection<?> collection) {
-		if(collection == null || collection.isEmpty()) {
+		if (collection == null || collection.isEmpty()) {
 			clear();
 			return true;
 		}
 		Node<T> node = startNode;
-		for(int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			node = node.next;
-			if(!collection.contains(node.data)) {
+			if (!collection.contains(node.data)) {
 				delete(node);
 			}
 		}
@@ -684,7 +688,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 		checkInterval(start, end);
 		Node<T> from = select(start);
 		T[] array = (T[]) new Object[end - start];
-		for(int i = start; i < end; i++) {
+		for (int i = start; i < end; i++) {
 			array[i] = from.data;
 		}
 		return new LinkList<>(array);
@@ -694,7 +698,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 
 		private Node<T> now = LinkList.this.startNode.next;
 
-		private int index = 0;
+		private int index;
 
 		public LinkListIterator() {
 			now = LinkList.this.startNode.next;
@@ -713,7 +717,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 
 		@Override
 		public T next() {
-			if(!hasNext()) {
+			if (!hasNext()) {
 				throw new IndexOutOfBoundsException();
 			}
 			T data = now.data;
@@ -729,7 +733,7 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 
 		@Override
 		public T previous() {
-			if(!hasPrevious()) {
+			if (!hasPrevious()) {
 				throw new IndexOutOfBoundsException();
 			}
 			T data = now.data;
@@ -784,6 +788,36 @@ public class LinkList<T> implements Iterable<T>, List<T> {
 	public ListIterator<T> listIterator(int index) {
 		checkLegal(index);
 		return new LinkListIterator(index);
+	}
+
+	@Override
+	public void bubbleSort() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void insertSort() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void selectSort() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mergeSort() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void quickSort() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

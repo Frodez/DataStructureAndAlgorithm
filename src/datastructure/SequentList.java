@@ -1,13 +1,19 @@
 package datastructure;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class SequentList<T> implements Iterable<T>, List<T> {
+public class SequentList<T extends Comparable<T>>
+	implements Serializable, Iterable<T>, List<T>, Sortable<T> {
 
-	private static final int BASE_CAPACITY = 10;
+	private static final long serialVersionUID = 1L;
+
+	private static final int BASE_CAPACITY = 15;
+
+	private static final int MAX_CAPACITY = 0x7fffffff;
 
 	private int size = 0;
 
@@ -17,17 +23,17 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 
 	@SuppressWarnings("unchecked")
 	public SequentList() {
-		array = (T[]) new Object[BASE_CAPACITY];
+		array = (T[]) new Comparable[BASE_CAPACITY];
 	}
 
 	@SuppressWarnings("unchecked")
 	public SequentList(int capacity) {
-		array = (T[]) new Object[capacity];
+		array = (T[]) new Comparable[capacity];
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public SequentList(int capacity, int ensurePercent) {
-		array = (T[]) new Object[capacity];
+		array = (T[]) new Comparable[capacity];
 		this.ensurePercent = ensurePercent;
 	}
 
@@ -69,13 +75,23 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 		return index < 0 || index >= size;
 	}
 
+	private void checkAdd(int... array) {
+		int check = MAX_CAPACITY;
+		for (int i = 0; i < array.length; i++) {
+			check = check - array[i];
+			if (check < 0) {
+				throw new IndexOutOfBoundsException();
+			}
+		}
+	}
+
 	/**
 	 * 判断索引值是否非法,非法抛出异常
 	 * @author Frodez
 	 * @date 2018-12-30
 	 */
 	private void checkLegal(int index) {
-		if(index < 0 || index >= size) {
+		if (index < 0 || index >= size) {
 			throw new IndexOutOfBoundsException();
 		}
 	}
@@ -86,20 +102,20 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	 * @date 2018-12-30
 	 */
 	private void checkInterval(int start, int end) {
-		if(isNotLegal(start)) {
+		if (isNotLegal(start)) {
 			throw new IndexOutOfBoundsException();
 		}
-		if(isNotLegal(end - 1)) {
+		if (isNotLegal(end - 1)) {
 			throw new IndexOutOfBoundsException();
 		}
-		if(end < start) {
+		if (end < start) {
 			throw new RuntimeException();
 		}
 	}
 
 	private void insert(int position, T data) {
 		ensureCapacity(size + 1);
-		for(int i = size - 1; i >= position; i--) {
+		for (int i = size - 1; i >= position; i--) {
 			array[i + 1] = array[i];
 		}
 		array[position] = data;
@@ -108,10 +124,10 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 
 	private void batchInsert(int position, T[] data) {
 		ensureCapacity(size + data.length);
-		for(int i = size - 1; i >= position; i--) {
+		for (int i = size - 1; i >= position; i--) {
 			array[i + data.length] = array[i];
 		}
-		for(int i = position; i < size; i++) {
+		for (int i = position; i < position + data.length; i++) {
 			array[i] = data[i - position];
 		}
 		size = size + data.length;
@@ -119,27 +135,27 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 
 	private T delete(int position) {
 		T data = array[position];
-		for(int i = position; i < size - 1; i++) {
+		for (int i = position; i < size - 1; i++) {
 			array[i] = array[i + 1];
 		}
 		size--;
 		return data;
 	}
-	
+
 	private T delete(Object data) {
 		return delete(data, 0, size);
 	}
-	
+
 	private T delete(Object data, int start, int end) {
-		if(data != null) {
-			for(int i = start; i < end; i++) {
-				if(data.equals(array[i])) {
+		if (data != null) {
+			for (int i = start; i < end; i++) {
+				if (data.equals(array[i])) {
 					return delete(i);
 				}
-			}			
+			}
 		} else {
-			for(int i = start; i < end; i++) {
-				if(array[i] == null) {
+			for (int i = start; i < end; i++) {
+				if (array[i] == null) {
 					return delete(i);
 				}
 			}
@@ -150,16 +166,16 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	@SuppressWarnings("unchecked")
 	private void batchDelete(int start, int end, T[] data) {
 		boolean[] status = new boolean[size];
-		for(int i = 0; i < data.length; i++) {
+		for (int i = 0; i < data.length; i++) {
 			int index = indexOfWithoutCheck(data[i], start, end);
-			if(index != -1) {
+			if (index != -1) {
 				status[index] = true;
 			}
 		}
 		T[] newArray = (T[]) new Object[array.length];
 		int count = 0;
-		for(int i = 0; i < size; i++) {
-			if(status[i] == false) {
+		for (int i = 0; i < size; i++) {
+			if (status[i] == false) {
 				newArray[count] = array[i];
 				count++;
 			}
@@ -197,7 +213,7 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	}
 
 	public void addAll(T[] data) {
-		batchInsert(size - 1, data);
+		batchInsert(size, data);
 	}
 
 	public void addAll(int position, T[] data) {
@@ -241,22 +257,22 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	public int indexOfSafely(Object data, int start, int end) {
 		start = start < 0 ? 0 : start;
 		end = end > size ? size : end;
-		if(start >= end) {
+		if (start >= end) {
 			throw new RuntimeException();
 		}
 		return indexOfWithoutCheck(data, start, end);
 	}
 
 	private int indexOfWithoutCheck(Object data, int start, int end) {
-		if(data != null) {
-			for(int i = start; i < end; i++) {
-				if(data.equals(array[i])) {
+		if (data != null) {
+			for (int i = start; i < end; i++) {
+				if (data.equals(array[i])) {
 					return i;
 				}
-			}			
+			}
 		} else {
-			for(int i = start; i < end; i++) {
-				if(array[i] == null) {
+			for (int i = start; i < end; i++) {
+				if (array[i] == null) {
 					return i;
 				}
 			}
@@ -277,22 +293,22 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	public int lastIndexOfSafely(Object data, int start, int end) {
 		start = start < 0 ? 0 : start;
 		end = end > size ? size : end;
-		if(start >= end) {
+		if (start >= end) {
 			throw new RuntimeException();
 		}
 		return lastIndexOfWithoutCheck(data, start, end);
 	}
 
 	private int lastIndexOfWithoutCheck(Object data, int start, int end) {
-		if(data != null) {
-			for(int i = end - 1; i >= start; i--) {
-				if(data.equals(array[i])) {
+		if (data != null) {
+			for (int i = end - 1; i >= start; i--) {
+				if (data.equals(array[i])) {
 					return i;
 				}
 			}
 		} else {
-			for(int i = end - 1; i >= start; i--) {
-				if(array[i] == null) {
+			for (int i = end - 1; i >= start; i--) {
+				if (array[i] == null) {
 					return i;
 				}
 			}
@@ -301,7 +317,7 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	}
 
 	private boolean ensureCapacity(int size) {
-		if(size * ensurePercent > this.array.length * 100) {
+		if (size * ensurePercent > this.array.length * 100) {
 			expand();
 			return true;
 		}
@@ -310,8 +326,9 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 
 	@SuppressWarnings("unchecked")
 	private void expand() {
-		T[] temp = (T[]) new Object[array.length * 2];
-		for(int i = 0; i < array.length; i++) {
+		checkAdd(array.length, array.length, 1);
+		T[] temp = (T[]) new Comparable[array.length * 2 + 1];
+		for (int i = 0; i < array.length; i++) {
 			temp[i] = array[i];
 		}
 	}
@@ -324,7 +341,7 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	@Override
 	public Object[] toArray() {
 		Object[] result = new Object[size];
-		for(int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			result[i] = array[i];
 		}
 		return result;
@@ -333,11 +350,11 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	@Override
 	@SuppressWarnings({ "unchecked", "hiding" })
 	public <T> T[] toArray(T[] a) {
-		if(a == null || a.length == 0) {
+		if (a == null || a.length == 0) {
 			return (T[]) new Object[] {};
 		}
-		for(int i = 0; i < a.length; i++) {
-			if(i < size) {
+		for (int i = 0; i < a.length; i++) {
+			if (i < size) {
 				a[i] = (T) array[i];
 			} else {
 				a[i] = null;
@@ -350,7 +367,7 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	public boolean containsAll(Collection<?> collection) {
 		Iterator<?> iterator = collection.iterator();
 		while (iterator.hasNext()) {
-			if(indexOf(iterator.next()) == -1) {
+			if (indexOf(iterator.next()) == -1) {
 				return false;
 			}
 		}
@@ -384,8 +401,8 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	public boolean retainAll(Collection<?> collection) {
 		T[] newArray = (T[]) new Object[array.length];
 		int count = 0;
-		for(int i = 0; i < size; i++) {
-			if(collection.contains(array[i])) {
+		for (int i = 0; i < size; i++) {
+			if (collection.contains(array[i])) {
 				newArray[count] = array[i];
 				count++;
 			}
@@ -405,15 +422,15 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	@Override
 	public List<T> subList(int start, int end) {
 		SequentList<T> newList = new SequentList<>(end - start);
-		for(int i = start; i < end; i++) {
+		for (int i = start; i < end; i++) {
 			newList.add(array[i]);
 		}
 		return newList;
 	}
 
 	public void reverse() {
-		if(size != 0) {
-			for(int i = 0; i < (size + 1) / 2; i++) {
+		if (size != 0) {
+			for (int i = 0; i < (size + 1) / 2; i++) {
 				T temp = array[i];
 				array[i] = array[size - 1 - i];
 				array[size - 1 - i] = temp;
@@ -423,7 +440,7 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 
 	private class SequentListIterator implements ListIterator<T> {
 
-		private int index = 0;
+		private int index;
 
 		public SequentListIterator() {
 		}
@@ -439,7 +456,7 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 
 		@Override
 		public T next() {
-			if(!hasNext()) {
+			if (!hasNext()) {
 				throw new IndexOutOfBoundsException();
 			}
 			return SequentList.this.array[index++];
@@ -452,7 +469,7 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 
 		@Override
 		public T previous() {
-			if(!hasPrevious()) {
+			if (!hasPrevious()) {
 				throw new IndexOutOfBoundsException();
 			}
 			return SequentList.this.array[--index];
@@ -501,6 +518,92 @@ public class SequentList<T> implements Iterable<T>, List<T> {
 	@Override
 	public ListIterator<T> listIterator(int index) {
 		return new SequentListIterator(index);
+	}
+
+	@Override
+	public void bubbleSort() {
+		for (int i = 0; i < size; i++) {
+			for (int j = i; j < size; j++) {
+				if (array[i].compareTo(array[j]) > 0) {
+					T temp = array[i];
+					array[i] = array[j];
+					array[j] = temp;
+				}
+			}
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void insertSort() {
+		T[] newArray = (T[]) new Object[size];
+		int sortedIndex = 0;
+		for (int i = 0; i < size; i++) {
+			int j = 0;
+			for (; j < sortedIndex; j++) {
+				if (newArray[j].compareTo(array[i]) > 0) {
+					break;
+				}
+			}
+			for (int k = sortedIndex - 1; k > j; k--) {
+				newArray[k] = newArray[k - 1];
+			}
+			newArray[j] = array[i];
+		}
+		for (int i = 0; i < size; i++) {
+			array[i] = newArray[i];
+		}
+	}
+
+	@Override
+	public void selectSort() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mergeSort() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void quickSort() {
+		quickSort(array, 0, size);
+	}
+
+	private void quickSort(T[] array, int start, int end) {
+		int smallerIndex = start - 1;
+		int equationIndex = start;
+		int largerIndex = end;
+		T example = array[start];
+		for (int i = start + 1; i < end; i++) {
+			T temp = array[i];
+			if (temp.compareTo(example) < 0) {
+				array[i] = array[equationIndex + 1];
+				array[equationIndex + 1] = array[smallerIndex + 1];
+				array[smallerIndex + 1] = temp;
+				smallerIndex++;
+				equationIndex++;
+			} else
+				if (temp.compareTo(example) == 0) {
+					array[i] = array[equationIndex + 1];
+					array[equationIndex + 1] = temp;
+					equationIndex++;
+				} else {
+					array[i] = array[largerIndex - 1];
+					array[largerIndex - 1] = temp;
+					largerIndex--;
+				}
+			if (equationIndex == largerIndex - 1) {
+				break;
+			}
+		}
+		if (smallerIndex == start - 1 && largerIndex == end) {
+			return;
+		}
+		quickSort(array, start, smallerIndex + 1);
+		quickSort(array, largerIndex, end);
 	}
 
 }
