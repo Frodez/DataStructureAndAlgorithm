@@ -573,33 +573,47 @@ public class SequentList<T extends Comparable<T>>
 	}
 
 	private void quickSort(T[] array, int start, int end) {
-		int smallerIndex = start - 1;
+		// 已排序部分中,最后一个小元素的index,默认为start
+		int smallerIndex = start;
+		// 已排序部分中,最后一个相等元素的index,默认为start
 		int equationIndex = start;
+		// 已排序部分中,最前一个大元素的index,默认为end
 		int largerIndex = end;
+		// 以第一个值作为example
 		T example = array[start];
-		for (int i = start + 1; i < end; i++) {
+		// 对[start + 1, end)部分进行遍历
+		for (int i = start + 1; i < end;) {
 			T temp = array[i];
 			if (temp.compareTo(example) < 0) {
-				array[i] = array[equationIndex + 1];
-				array[equationIndex + 1] = array[smallerIndex + 1];
+				// 小于example时,将其与已排序部分中小元素之后第一个元素交换
+				// smallerIndex和equationIndex均+1.遍历下个元素.
+				array[i] = array[smallerIndex + 1];
 				array[smallerIndex + 1] = temp;
 				smallerIndex++;
 				equationIndex++;
-			} else
-				if (temp.compareTo(example) == 0) {
-					array[i] = array[equationIndex + 1];
-					array[equationIndex + 1] = temp;
-					equationIndex++;
-				} else {
-					array[i] = array[largerIndex - 1];
-					array[largerIndex - 1] = temp;
-					largerIndex--;
-				}
+				i++;
+			} else if (temp.compareTo(example) == 0) {
+				// 等于example时,equation+1,遍历下个元素.
+				equationIndex++;
+				i++;
+			} else {
+				// 大于example时,将其与已排序部分中大元素之前第一个元素交换
+				// largerIndex+1,但仍遍历该位置元素,直到不大于example为止.
+				array[i] = array[largerIndex - 1];
+				array[largerIndex - 1] = temp;
+				largerIndex--;
+			}
 			if (equationIndex == largerIndex - 1) {
+				// 如果largerIndex正好比equationIndex大1,说明已经碰到一起了,本次遍历完毕.
 				break;
 			}
 		}
-		if (smallerIndex == start - 1 && largerIndex == end) {
+		// 将start处元素与已排序部分中小元素最后一个交换位置,smallerIndex减1.
+		array[start] = array[smallerIndex];
+		array[smallerIndex] = example;
+		smallerIndex--;
+		// 如果本次排序的所有值均相等,说明这一部分的元素已经完成了排序.
+		if (equationIndex == end) {
 			return;
 		}
 		quickSort(array, start, smallerIndex + 1);
