@@ -520,6 +520,11 @@ public class SequentList<T extends Comparable<T>>
 		return new SequentListIterator(index);
 	}
 
+	/**
+	 * 冒泡排序
+	 * @author Frodez
+	 * @date 2019-01-07
+	 */
 	@Override
 	public void bubbleSort() {
 		for (int i = 0; i < size; i++) {
@@ -533,40 +538,143 @@ public class SequentList<T extends Comparable<T>>
 		}
 	}
 
+	/**
+	 * 插入排序
+	 * @author Frodez
+	 * @date 2019-01-07
+	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void insertSort() {
-		T[] newArray = (T[]) new Object[size];
+		// 已排序序列的后面一个的位置
 		int sortedIndex = 0;
+		// 遍历全序列
 		for (int i = 0; i < size; i++) {
+			// i和sortedIndex永远相等
 			int j = 0;
+			// 遍历已排序序列(此序列从小到大排列)
 			for (; j < sortedIndex; j++) {
-				if (newArray[j].compareTo(array[i]) > 0) {
+				// 如果遇到第一个比自己大的元素
+				if (array[j].compareTo(array[i]) > 0) {
+					T temp = array[sortedIndex];
+					// 将此元素以及之后已排序的元素全部向后移动一格
+					for (int k = sortedIndex; k > j; k--) {
+						array[k] = array[k - 1];
+					}
+					// 将自己放入此元素原位置
+					array[j] = temp;
+					// 已排序序列向后延伸一位
+					sortedIndex++;
 					break;
 				}
 			}
-			for (int k = sortedIndex - 1; k > j; k--) {
-				newArray[k] = newArray[k - 1];
+			if (j == sortedIndex) {
+				// 说明已排序序列中所有元素均小于自己
+				T temp = array[sortedIndex];
+				array[sortedIndex] = array[i];
+				array[i] = temp;
+				// 已排序序列向后延伸一位
+				sortedIndex++;
 			}
-			newArray[j] = array[i];
-		}
-		for (int i = 0; i < size; i++) {
-			array[i] = newArray[i];
 		}
 	}
 
+	/**
+	 * 选择排序
+	 * @author Frodez
+	 * @date 2019-01-07
+	 */
 	@Override
 	public void selectSort() {
-		// TODO Auto-generated method stub
-
+		// 已排序序列的后面一个的位置
+		int sortedIndex = 0;
+		for (int i = 0; i < size; i++) {
+			T min = array[i];
+			int minIndex = i;
+			for (int j = sortedIndex; j < size; j++) {
+				if (array[j].compareTo(min) < 0) {
+					// 找到最小位置和值,默认为外层遍历当前位置和当前值
+					min = array[j];
+					minIndex = j;
+				}
+			}
+			// 将其与已排序序列后面一个交换
+			array[minIndex] = array[sortedIndex];
+			array[sortedIndex] = min;
+			// 排序序列长度加1
+			sortedIndex++;
+		}
 	}
 
+	/**
+	 * 归并排序
+	 * @author Frodez
+	 * @date 2019-01-07
+	 */
 	@Override
 	public void mergeSort() {
-		// TODO Auto-generated method stub
-
+		mergeSort(array, 0, size);
 	}
 
+	@SuppressWarnings("unchecked")
+	private void mergeSort(T[] array, int start, int end) {
+		// 如果抵达递归终点
+		if (end - start <= 2) {
+			if (end == start + 2) {
+				if (array[start].compareTo(array[start + 1]) > 0) {
+					T temp = array[start];
+					array[start] = array[start + 1];
+					array[start + 1] = temp;
+				}
+			}
+			return;
+		}
+		// 将序列两等分递归,分别排序
+		int middle = (start + end) / 2;
+		mergeSort(array, start, middle);
+		mergeSort(array, middle, end);
+		// 分别排序完后,进行归并
+		int beforeIndex = 0;
+		int afterIndex = 0;
+		int beforeLength = middle - start;
+		int afterLength = end - middle;
+		T[] beforeArray = (T[]) new Comparable[beforeLength];
+		T[] afterArray = (T[]) new Comparable[afterLength];
+		for (int i = start; i < middle; i++) {
+			beforeArray[i - start] = array[i];
+		}
+		for (int i = middle; i < end; i++) {
+			afterArray[i - middle] = array[i];
+		}
+		for (int i = start; i < end; i++) {
+			if (beforeIndex != beforeLength && afterIndex != afterLength) {
+				if (beforeArray[beforeIndex].compareTo(afterArray[afterIndex]) <= 0) {
+					array[i] = beforeArray[beforeIndex];
+					beforeIndex++;
+					continue;
+				} else {
+					array[i] = afterArray[afterIndex];
+					afterIndex++;
+					continue;
+				}
+			}
+			if (beforeIndex != beforeLength && afterIndex == afterLength) {
+				array[i] = beforeArray[beforeIndex];
+				beforeIndex++;
+				continue;
+			}
+			if (beforeIndex == beforeLength && afterIndex != afterLength) {
+				array[i] = afterArray[afterIndex];
+				afterIndex++;
+				continue;
+			}
+		}
+	}
+
+	/**
+	 * 快速排序
+	 * @author Frodez
+	 * @date 2019-01-07
+	 */
 	@Override
 	public void quickSort() {
 		quickSort(array, 0, size);
@@ -618,6 +726,39 @@ public class SequentList<T extends Comparable<T>>
 		}
 		quickSort(array, start, smallerIndex + 1);
 		quickSort(array, largerIndex, end);
+	}
+
+	/**
+	 * toString方法,null值会转换为"null"
+	 * @author Frodez
+	 * @date 2018-12-30
+	 */
+	@Override
+	public String toString() {
+		return toString("null");
+	}
+
+	/**
+	 * toString方法,null值会按默认字符串转换
+	 * @author Frodez
+	 * @date 2018-12-30
+	 */
+	public String toString(String defaultString) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for (int i = 0; i < size; i++) {
+			T data = array[i];
+			if (data == null) {
+				sb.append(defaultString);
+			} else {
+				sb.append(data.toString());
+			}
+			if (i != size - 1) {
+				sb.append(", ");
+			}
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 
 }
