@@ -12,6 +12,11 @@ public class Test {
 		// bigDecimalList.selectSort();
 		bigDecimalList.mergeSort();
 		System.out.println(bigDecimalList.toString());
+		Tree<Integer> tree = new Tree<>(16);
+		tree.addFirstChild(12);
+		tree.recursiveAheadIter((iter, depth) -> {
+			System.out.println("depth:" + depth + ", data:" + iter);
+		});
 	}
 
 }

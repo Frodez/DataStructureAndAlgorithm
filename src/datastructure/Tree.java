@@ -1,6 +1,6 @@
 package datastructure;
 
-import java.util.function.Function;
+import java.util.function.BiConsumer;
 
 public class Tree<T> {
 
@@ -36,6 +36,8 @@ public class Tree<T> {
 		 */
 		public Node<T> lastChild;
 
+		public int depth = 0;
+
 		public Node(T data, Node<T> parent, Node<T> prev, Node<T> next, Node<T> firstChild,
 			Node<T> lastChild) {
 			this.data = data;
@@ -44,6 +46,7 @@ public class Tree<T> {
 			this.next = next;
 			this.firstChild = firstChild;
 			this.lastChild = lastChild;
+			this.depth = parent == null ? 0 : parent.depth + 1;
 		}
 
 	}
@@ -66,8 +69,12 @@ public class Tree<T> {
 	 * @author Frodez
 	 * @date 2019-01-08
 	 */
-	public T getData() {
+	public T now() {
 		return now.data;
+	}
+
+	public int nowDepth() {
+		return now.depth;
 	}
 
 	/**
@@ -142,8 +149,8 @@ public class Tree<T> {
 	 * @author Frodez
 	 * @date 2019-01-08
 	 */
-	public void recursiveAheadIter(Function<T, ?> function) {
-		recursiveAheadIter(root, function);
+	public void recursiveAheadIter(BiConsumer<T, Integer> consumer) {
+		recursiveAheadIter(root, consumer);
 	}
 
 	/**
@@ -151,11 +158,11 @@ public class Tree<T> {
 	 * @author Frodez
 	 * @date 2019-01-08
 	 */
-	private void recursiveAheadIter(Node<T> iter, Function<T, ?> function) {
-		function.apply(now.data);
-		Node<T> next = now.firstChild;
+	private void recursiveAheadIter(Node<T> iter, BiConsumer<T, Integer> consumer) {
+		consumer.accept(iter.data, iter.depth);
+		Node<T> next = iter.firstChild;
 		while (next != null) {
-			recursiveAheadIter(next, function);
+			recursiveAheadIter(next, consumer);
 			next = next.next;
 		}
 	}
