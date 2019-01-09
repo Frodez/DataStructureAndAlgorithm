@@ -152,12 +152,58 @@ public class Tree<T> {
 	 * @date 2019-01-08
 	 */
 	private void recursiveAheadIter(Node<T> iter, Function<T, ?> function) {
-		function.apply(now.data);
-		Node<T> next = now.firstChild;
+		function.apply(iter.data);
+		Node<T> next = iter.firstChild;
 		while (next != null) {
 			recursiveAheadIter(next, function);
 			next = next.next;
 		}
+	}
+	
+	/**
+	 * 递归式中序遍历
+	 * @author Frodez
+	 * @date 2019-01-08
+	 */
+	public void recursiveMiddleIter(Function<T, ?> function) {
+		recursiveMiddleIter(root, function);
+	}
+
+	/**
+	 * 递归式中序遍历
+	 * @author Frodez
+	 * @date 2019-01-08
+	 */
+	private void recursiveMiddleIter(Node<T> iter, Function<T, ?> function) {		
+		Node<T> next = iter.firstChild;
+		while (next != null) {
+			recursiveMiddleIter(next, function);
+			function.apply(iter.data);
+			next = next.next;
+		}
+	}
+	
+	/**
+	 * 递归式后序遍历
+	 * @author Frodez
+	 * @date 2019-01-08
+	 */
+	public void recursiveAfterIter(Function<T, ?> function) {
+		recursiveAfterIter(root, function);
+	}
+
+	/**
+	 * 递归式后序遍历
+	 * @author Frodez
+	 * @date 2019-01-08
+	 */
+	private void recursiveAfterIter(Node<T> iter, Function<T, ?> function) {		
+		Node<T> next = iter.firstChild;
+		while (next != null) {
+			recursiveAfterIter(next, function);
+			next = next.next;
+		}
+		function.apply(iter.data);
 	}
 
 }

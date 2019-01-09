@@ -12,13 +12,15 @@ import java.util.Stack;
 public class ReversePolishNotation {
 	
 	public enum SignalEnum {
-		EOF((byte)0, "EOF"),
+		EOF((byte)0, "EOF"),		
 		RIGHT_BRACKETS((byte)1, ")"),
-		ADD((byte)2, "+"),
-		SUB((byte)2, "-"),
-		MUL((byte)3, "*"),
-		DIV((byte)3, "/"),
-		LEFT_BRACKETS((byte)4, "(");
+		LEFT_SHIFT((byte) 2, "<<"),
+		RIGHT_SHIFT((byte) 2, ">>"),
+		ADD((byte)3, "+"),
+		SUB((byte)3, "-"),
+		MUL((byte)4, "*"),
+		DIV((byte)4, "/"),
+		LEFT_BRACKETS((byte)5, "(");
 		private byte priority;
 		private String signal;
 		private SignalEnum(byte priority, String signal) {
@@ -38,7 +40,7 @@ public class ReversePolishNotation {
 	            }
 	        }
 	        return null;
-	    }		
+	    }
 	}
 	
 	private static String BLANK = " ";
@@ -52,7 +54,7 @@ public class ReversePolishNotation {
 	public static boolean compare(String first, String second) {
 		SignalEnum firstEnum = SignalEnum.of(first);
 		SignalEnum secondEnum = SignalEnum.of(second);
-		return firstEnum.getPriority() < secondEnum.getPriority();
+		return firstEnum.priority < secondEnum.priority;
 	}	
 	
 	/**
@@ -135,11 +137,11 @@ public class ReversePolishNotation {
 		Stack<String> expressionStack = new Stack<String>();
 		//操作符栈
 		Stack<String> signalStack = new Stack<String>();
-		for(String item : list) {
+		for(String now : list) {
 			//如果不是操作符,则放入表达式栈(忽略空格)
-			if(SignalEnum.of(item) == null) {
-				if(!item.equals(BLANK)) {
-					expressionStack.push(item);
+			if(SignalEnum.of(now) == null) {
+				if(!now.equals(BLANK)) {
+					expressionStack.push(now);
 				}
 				continue;
 			}
@@ -148,11 +150,11 @@ public class ReversePolishNotation {
 			while(true) {
 				if(signalStack.isEmpty()) {
 					recoverStack(tempStack, signalStack);
-					signalStack.push(item);
+					signalStack.push(now);
 					break;
 				}
 				String signal = signalStack.pop();
-				if(compare(signal, item)) {
+				if(compare(signal, now)) {
 					//如果操作符栈顶的操作符优先级低于当前操作符,则中止操作
 					if(signal.equals(SignalEnum.RIGHT_BRACKETS.signal)) {
 						throw new RuntimeException("非法的右括号!");
@@ -161,19 +163,19 @@ public class ReversePolishNotation {
 					//直接中止
 					recoverStack(tempStack, signalStack);
 					//将当前操作符也放入操作符栈
-					signalStack.push(item);
+					signalStack.push(now);
 					break;
 				}
 				//左括号的操作
 				if(signal.equals(SignalEnum.LEFT_BRACKETS.signal)) {
-					if(!item.equals(SignalEnum.RIGHT_BRACKETS.signal)) {
+					if(!now.equals(SignalEnum.RIGHT_BRACKETS.signal)) {
 						//如果当前操作符不是右括号
 						//则将其放入暂存栈中
 						tempStack.push(signal);
 						//直接中止
 						recoverStack(tempStack, signalStack);
 						//将当前操作符也放入操作符栈
-						signalStack.push(item);
+						signalStack.push(now);
 					} else {
 						//直接中止
 						recoverStack(tempStack, signalStack);
@@ -194,7 +196,7 @@ public class ReversePolishNotation {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(convert("a + (b - c * d) - 23"));
+		System.out.println(convert("a << 2 + (b - c * d) - 23"));
 
 	}
 
