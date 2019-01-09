@@ -167,4 +167,50 @@ public class Tree<T> {
 		}
 	}
 
+	/**
+	 * 递归式中序遍历
+	 * @author Frodez
+	 * @date 2019-01-08
+	 */
+	public void recursiveMiddleIter(BiConsumer<T, Integer> consumer) {
+		recursiveMiddleIter(root, consumer);
+	}
+
+	/**
+	 * 递归式中序遍历
+	 * @author Frodez
+	 * @date 2019-01-08
+	 */
+	private void recursiveMiddleIter(Node<T> iter, BiConsumer<T, Integer> consumer) {
+		Node<T> next = iter.firstChild;
+		while (next != null) {
+			recursiveMiddleIter(next, consumer);
+			consumer.accept(iter.data, iter.depth);
+			next = next.next;
+		}
+	}
+
+	/**
+	 * 递归式后序遍历
+	 * @author Frodez
+	 * @date 2019-01-08
+	 */
+	public void recursiveAfterIter(BiConsumer<T, Integer> consumer) {
+		recursiveAfterIter(root, consumer);
+	}
+
+	/**
+	 * 递归式后序遍历
+	 * @author Frodez
+	 * @date 2019-01-08
+	 */
+	private void recursiveAfterIter(Node<T> iter, BiConsumer<T, Integer> consumer) {
+		Node<T> next = iter.firstChild;
+		while (next != null) {
+			recursiveAfterIter(next, consumer);
+			next = next.next;
+		}
+		consumer.accept(iter.data, iter.depth);
+	}
+
 }
