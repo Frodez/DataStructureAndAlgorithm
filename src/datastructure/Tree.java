@@ -1,10 +1,13 @@
 package datastructure;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.Stack;
 import java.util.function.BiConsumer;
 
-public class Tree<T> {
+public class Tree<T extends Comparable<T>> {
 
-	private static class Node<T> {
+	public static class Node<T> {
 
 		/**
 		 * 数据
@@ -36,10 +39,12 @@ public class Tree<T> {
 		 */
 		public Node<T> lastChild;
 
+		/**
+		 * 深度
+		 */
 		public int depth = 0;
 
-		public Node(T data, Node<T> parent, Node<T> prev, Node<T> next, Node<T> firstChild,
-			Node<T> lastChild) {
+		public Node(T data, Node<T> parent, Node<T> prev, Node<T> next, Node<T> firstChild, Node<T> lastChild) {
 			this.data = data;
 			this.parent = parent;
 			this.prev = prev;
@@ -55,6 +60,8 @@ public class Tree<T> {
 
 	private Node<T> now;
 
+	private int size = 0;
+
 	/**
 	 * 初始化树
 	 * @param root
@@ -62,6 +69,11 @@ public class Tree<T> {
 	public Tree(T root) {
 		this.root = new Node<>(root, null, null, null, null, null);
 		this.now = this.root;
+		size = 1;
+	}
+
+	public int size() {
+		return size;
 	}
 
 	/**
@@ -73,7 +85,56 @@ public class Tree<T> {
 		return now.data;
 	}
 
-	public int nowDepth() {
+	public void root() {
+		now = root;
+	}
+
+	public boolean firstChild() {
+		if (now.firstChild != null) {
+			now = now.firstChild;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean lastChild() {
+		if (now.lastChild != null) {
+			now = now.lastChild;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean prevBrother() {
+		if (now.prev != null) {
+			now = now.prev;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean nextBrother() {
+		if (now.next != null) {
+			now = now.next;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean parent() {
+		if (now.parent != null) {
+			now = now.parent;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public int depth() {
 		return now.depth;
 	}
 
@@ -94,6 +155,7 @@ public class Tree<T> {
 			now.firstChild = new Node<>(data, now, null, null, null, null);
 			now.lastChild = now.firstChild;
 		}
+		size++;
 	}
 
 	/**
@@ -110,6 +172,7 @@ public class Tree<T> {
 			now.lastChild = new Node<>(data, now, null, null, null, null);
 			now.firstChild = now.lastChild;
 		}
+		size++;
 	}
 
 	/**
@@ -126,6 +189,7 @@ public class Tree<T> {
 		if (oldNext != null) {
 			oldNext.prev = now.next;
 		}
+		size++;
 	}
 
 	/**
@@ -142,6 +206,7 @@ public class Tree<T> {
 		if (oldPrev != null) {
 			oldPrev.next = now.prev;
 		}
+		size++;
 	}
 
 	/**
@@ -167,26 +232,13 @@ public class Tree<T> {
 		}
 	}
 
-	/**
-	 * 递归式中序遍历
-	 * @author Frodez
-	 * @date 2019-01-08
-	 */
-	public void recursiveMiddleIter(BiConsumer<T, Integer> consumer) {
-		recursiveMiddleIter(root, consumer);
-	}
-
-	/**
-	 * 递归式中序遍历
-	 * @author Frodez
-	 * @date 2019-01-08
-	 */
-	private void recursiveMiddleIter(Node<T> iter, BiConsumer<T, Integer> consumer) {
-		Node<T> next = iter.firstChild;
-		while (next != null) {
-			recursiveMiddleIter(next, consumer);
-			consumer.accept(iter.data, iter.depth);
-			next = next.next;
+	public void aheadIter(BiConsumer<T, Integer> consumer) {
+		Node<T> node = root;
+		Queue<Node<T>> queue = new ArrayDeque<>(size);
+		Stack<Node<T>> stack = new Stack<>();
+		while (true) {
+			stack.push(node);
+			queue.add(node);
 		}
 	}
 

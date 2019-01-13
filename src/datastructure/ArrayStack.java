@@ -51,9 +51,9 @@ public class ArrayStack<T extends Comparable<T>> implements Serializable {
 
 	private void checkAdd(int... array) {
 		int check = MAX_CAPACITY;
-		for(int i = 0; i < array.length; i++) {
+		for (int i = 0; i < array.length; i++) {
 			check = check - array[i];
-			if(check < 0) {
+			if (check < 0) {
 				throw new IndexOutOfBoundsException();
 			}
 		}
@@ -81,14 +81,14 @@ public class ArrayStack<T extends Comparable<T>> implements Serializable {
 
 	@SuppressWarnings("unchecked")
 	public boolean ensureCapacity(int capacity) {
-		if(!permitResize) {
+		if (!permitResize) {
 			return false;
 		}
-		if(capacity < size) {
+		if (capacity < size) {
 			return false;
 		}
 		T[] newArray = (T[]) new Object[capacity];
-		for(int i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			newArray[i] = array[i];
 		}
 		array = newArray;
@@ -96,35 +96,35 @@ public class ArrayStack<T extends Comparable<T>> implements Serializable {
 	}
 
 	public T peek() {
-		if(size == 0) {
+		if (size == 0) {
 			return null;
 		}
 		return select();
 	}
 
 	public T element() {
-		if(size == 0) {
+		if (size == 0) {
 			throw new NoSuchElementException();
 		}
 		return select();
 	}
 
 	public T pop() {
-		if(size == 0) {
+		if (size == 0) {
 			return null;
 		}
 		return delete();
 	}
 
 	public T remove() {
-		if(size == 0) {
+		if (size == 0) {
 			throw new NoSuchElementException();
 		}
 		return delete();
 	}
 
 	public boolean push(T data) {
-		if(size == array.length) {
+		if (size == array.length) {
 			return false;
 		}
 		insert(data);
@@ -132,7 +132,7 @@ public class ArrayStack<T extends Comparable<T>> implements Serializable {
 	}
 
 	public boolean add(T data) {
-		if(size == array.length) {
+		if (size == array.length) {
 			throw new IllegalStateException();
 		}
 		insert(data);
@@ -140,16 +140,16 @@ public class ArrayStack<T extends Comparable<T>> implements Serializable {
 	}
 
 	public int minimumDepth(Object data) {
-		if(data == null) {
-			for(int i = size - 1; i >= 0; i--) {
-				if(array[i] == null) {
+		if (data == null) {
+			for (int i = size - 1; i >= 0; i--) {
+				if (array[i] == null) {
 					return size - i;
 				}
 			}
 			return size;
 		} else {
-			for(int i = size - 1; i >= 0; i--) {
-				if(data.equals(array[i])) {
+			for (int i = size - 1; i >= 0; i--) {
+				if (data.equals(array[i])) {
 					return size - i;
 				}
 			}
@@ -158,16 +158,16 @@ public class ArrayStack<T extends Comparable<T>> implements Serializable {
 	}
 
 	public int minimumHeight(Object data) {
-		if(data == null) {
-			for(int i = 0; i < size; i++) {
-				if(array[i] == null) {
+		if (data == null) {
+			for (int i = 0; i < size; i++) {
+				if (array[i] == null) {
 					return i + 1;
 				}
 			}
 			return size;
 		} else {
-			for(int i = 0; i < size; i++) {
-				if(data.equals(array[i])) {
+			for (int i = 0; i < size; i++) {
+				if (data.equals(array[i])) {
 					return i + 1;
 				}
 			}

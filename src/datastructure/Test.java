@@ -2,6 +2,16 @@ package datastructure;
 
 public class Test {
 
+	public static final String INDENT = "  ";
+
+	public static String indent(int num) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < num; i++) {
+			sb.append(INDENT);
+		}
+		return sb.toString();
+	}
+
 	public static void main(String[] args) {
 		SequentList<Integer> bigDecimalList = new SequentList<>();
 		bigDecimalList.addAll(new Integer[] { 1, 2, 3, 4, 5, 15, 2, 10, 9 });
@@ -12,10 +22,19 @@ public class Test {
 		// bigDecimalList.selectSort();
 		bigDecimalList.mergeSort();
 		System.out.println(bigDecimalList.toString());
-		Tree<Integer> tree = new Tree<>(16);
+		Tree<Integer> tree = new Tree<>(10);
 		tree.addFirstChild(12);
-		tree.recursiveAheadIter((iter, depth) -> {
-			System.out.println("depth:" + depth + ", data:" + iter);
+		tree.addLastChild(14);
+		tree.addLastChild(16);
+		tree.firstChild();
+		tree.addFirstChild(18);
+		tree.nextBrother();
+		tree.addFirstChild(20);
+		tree.nextBrother();
+		tree.addFirstChild(22);
+		tree.addFirstChild(24);
+		tree.recursiveAfterIter((iter, depth) -> {
+			System.out.println(indent(depth) + "data:" + iter);
 		});
 	}
 
