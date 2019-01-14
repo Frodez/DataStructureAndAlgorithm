@@ -13,27 +13,50 @@ public class Test {
 	}
 
 	public static void main(String[] args) {
-		SequentList<Integer> bigDecimalList = new SequentList<>();
-		bigDecimalList.addAll(new Integer[] { 1, 2, 3, 4, 5, 15, 2, 10, 9 });
-		bigDecimalList.addAll(2, new Integer[] { 6, 7, 2, 8, 12 });
-		System.out.println(bigDecimalList.toString());
-		// bigDecimalList.insertSort();
-		// bigDecimalList.quickSort();
-		// bigDecimalList.selectSort();
-		bigDecimalList.mergeSort();
-		System.out.println(bigDecimalList.toString());
+		//		SequentList<Integer> bigDecimalList = new SequentList<>();
+		//		bigDecimalList.addAll(new Integer[] { 1, 2, 3, 4, 5, 15, 2, 10, 9 });
+		//		bigDecimalList.addAll(2, new Integer[] { 6, 7, 2, 8, 12 });
+		//		System.out.println(bigDecimalList.toString());
+		//		bigDecimalList.insertSort();
+		//		bigDecimalList.quickSort();
+		//		bigDecimalList.selectSort();
+		//		bigDecimalList.mergeSort();
+		//		System.out.println(bigDecimalList.toString());
 		Tree<Integer> tree = new Tree<>(10);
 		tree.addFirstChild(12);
 		tree.addLastChild(14);
 		tree.addLastChild(16);
 		tree.firstChild();
+		tree.addFirstChild(17);
 		tree.addFirstChild(18);
+		tree.lastChild();
+		tree.addFirstChild(101);
+		tree.addFirstChild(100);
+		tree.root();
+		tree.firstChild();
 		tree.nextBrother();
+		tree.addFirstChild(19);
 		tree.addFirstChild(20);
 		tree.nextBrother();
 		tree.addFirstChild(22);
+		tree.addFirstChild(23);
 		tree.addFirstChild(24);
+		tree.firstChild();
+		tree.nextBrother();
+		tree.addFirstChild(30);
+		tree.recursiveAheadIter((iter, depth) -> {
+			System.out.println(indent(depth) + "data:" + iter);
+		});
+		System.out.println("-----------------------------------");
+		tree.aheadIter((iter, depth) -> {
+			System.out.println(indent(depth) + "data:" + iter);
+		});
+		System.out.println("-----------------------------------");
 		tree.recursiveAfterIter((iter, depth) -> {
+			System.out.println(indent(depth) + "data:" + iter);
+		});
+		System.out.println("-----------------------------------");
+		tree.afterIter((iter, depth) -> {
 			System.out.println(indent(depth) + "data:" + iter);
 		});
 	}

@@ -1,7 +1,5 @@
 package datastructure;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.Stack;
 import java.util.function.BiConsumer;
 
@@ -52,6 +50,11 @@ public class Tree<T extends Comparable<T>> {
 			this.firstChild = firstChild;
 			this.lastChild = lastChild;
 			this.depth = parent == null ? 0 : parent.depth + 1;
+		}
+
+		@Override
+		public String toString() {
+			return data.toString();
 		}
 
 	}
@@ -232,13 +235,34 @@ public class Tree<T extends Comparable<T>> {
 		}
 	}
 
+	/**
+	 * 非递归式先序遍历
+	 * @author Frodez
+	 * @date 2019-01-14
+	 */
 	public void aheadIter(BiConsumer<T, Integer> consumer) {
 		Node<T> node = root;
-		Queue<Node<T>> queue = new ArrayDeque<>(size);
 		Stack<Node<T>> stack = new Stack<>();
 		while (true) {
+			//先对自己进行操作,并将自己压入栈中.
+			//如果有子节点,则指向最左边的子节点.
+			//如果没有子节点,则将栈顶元素退出,直到退出的栈顶元素拥有下一个兄弟节点为止.此时指向下一个兄弟节点.
+			//如果退出的栈顶元素为根节点,则终止循环.
+			consumer.accept(node.data, node.depth);
 			stack.push(node);
-			queue.add(node);
+			if (node.firstChild != null) {
+				node = node.firstChild;
+			} else {
+				while (true) {
+					Node<T> temp = stack.pop();
+					if (temp == root) {
+						return;
+					}
+					if (temp.next != null) {
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -263,6 +287,44 @@ public class Tree<T extends Comparable<T>> {
 			next = next.next;
 		}
 		consumer.accept(iter.data, iter.depth);
+	}
+
+	/**
+	 * 非递归式后序遍历
+	 * @author Frodez
+	 * @date 2019-01-14
+	 */
+	public void afterIter(BiConsumer<T, Integer> consumer) {
+		Node<T> node = root;
+		Stack<Node<T>> stack = new Stack<>();
+		while (true) {
+			//如果当前节点存在子节点,则将当前节点压入栈中,并指向第一个子节点.
+			//如果当前节点不存在子节点,则操作本元素,且判断是否存在下一个兄弟节点.
+			//如果存在下一个兄弟节点,则指向下一个兄弟节点.
+			//如果不存在下一个兄弟节点,则将栈顶元素弹出,判断其是否存在下一个兄弟节点,直到存在下一个兄弟节点为止.
+			//此时指向下一个兄弟节点.
+			//如果弹出元素为根节点,则退出循环.
+			if (node.firstChild != null) {
+				stack.push(node);
+				node = node.firstChild;
+			} else {
+				consumer.accept(node.data, node.depth);
+				if (node.next == null) {
+					while (true) {
+						Node<T> temp = stack.pop();
+						if (temp == root) {
+							return;
+						}
+						if (temp.next != null) {
+							node = temp.next;
+							break;
+						}
+					}
+				} else {
+					node = node.next;
+				}
+			}
+		}
 	}
 
 }
