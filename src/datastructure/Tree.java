@@ -259,6 +259,7 @@ public class Tree<T extends Comparable<T>> {
 						return;
 					}
 					if (temp.next != null) {
+						node = temp.next;
 						break;
 					}
 				}
