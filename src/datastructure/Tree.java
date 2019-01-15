@@ -88,6 +88,10 @@ public class Tree<T extends Comparable<T>> {
 		return now.data;
 	}
 
+	public int depth() {
+		return now.depth;
+	}
+
 	public void root() {
 		now = root;
 	}
@@ -135,10 +139,6 @@ public class Tree<T extends Comparable<T>> {
 		} else {
 			return false;
 		}
-	}
-
-	public int depth() {
-		return now.depth;
 	}
 
 	/**
