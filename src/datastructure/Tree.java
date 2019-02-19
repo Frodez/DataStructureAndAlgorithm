@@ -1,9 +1,10 @@
 package datastructure;
 
+import java.util.NoSuchElementException;
 import java.util.Stack;
 import java.util.function.BiConsumer;
 
-public class Tree<T extends Comparable<T>> {
+public class Tree<T> {
 
 	public static class Node<T> {
 
@@ -92,53 +93,59 @@ public class Tree<T extends Comparable<T>> {
 		return now.depth;
 	}
 
-	public void root() {
+	public void toRoot() {
 		now = root;
 	}
 
-	public boolean firstChild() {
-		if (now.firstChild != null) {
-			now = now.firstChild;
-			return true;
-		} else {
-			return false;
-		}
+	public boolean hasChild() {
+		return now.firstChild != null;
 	}
 
-	public boolean lastChild() {
-		if (now.lastChild != null) {
-			now = now.lastChild;
-			return true;
-		} else {
-			return false;
-		}
+	public boolean hasPrev() {
+		return now.prev != null;
 	}
 
-	public boolean prevBrother() {
-		if (now.prev != null) {
-			now = now.prev;
-			return true;
-		} else {
-			return false;
-		}
+	public boolean hasNext() {
+		return now.next != null;
 	}
 
-	public boolean nextBrother() {
-		if (now.next != null) {
-			now = now.next;
-			return true;
-		} else {
-			return false;
-		}
+	public boolean isRoot() {
+		return now == root;
 	}
 
-	public boolean parent() {
-		if (now.parent != null) {
-			now = now.parent;
-			return true;
-		} else {
-			return false;
+	public void toFirstChild() {
+		if (now.firstChild == null) {
+			throw new NoSuchElementException();
 		}
+		now = now.firstChild;
+	}
+
+	public void toLastChild() {
+		if (now.lastChild == null) {
+			throw new NoSuchElementException();
+		}
+		now = now.lastChild;
+	}
+
+	public void toPrevBrother() {
+		if (now.prev == null) {
+			throw new NoSuchElementException();
+		}
+		now = now.prev;
+	}
+
+	public void toNextBrother() {
+		if (now.next == null) {
+			throw new NoSuchElementException();
+		}
+		now = now.next;
+	}
+
+	public void toParent() {
+		if (now.parent == null) {
+			throw new NoSuchElementException();
+		}
+		now = now.parent;
 	}
 
 	/**
