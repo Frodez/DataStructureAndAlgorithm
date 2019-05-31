@@ -13,6 +13,19 @@ public class Test {
 	}
 
 	public static void main(String[] args) {
+		AVLTree<Integer> tree = new AVLTree<>();
+		tree.insert(50);
+		tree.insert(60);
+		tree.insert(90);
+		tree.insert(40);
+		tree.insert(10);
+		tree.insert(30);
+		tree.insert(80);
+		tree.insert(70);
+		tree.insert(20);
+		tree.insert(100);
+		tree.insert(45);
+		System.out.println(tree);
 		//		BinaryTree<Integer> tree = new BinaryTree<>(10);
 		//		tree.addLeft(12);
 		//		tree.addRight(15);
@@ -23,28 +36,29 @@ public class Test {
 		//		tree.toRight();
 		//		tree.addLeft(13);
 		//		tree.addRight(18);
-		//		tree.layerIter((data, depth) -> {
+		//		System.out.println(tree.toString());
+		//		tree.afterIter((data, depth) -> {
 		//			System.out.println(indent(depth) + data);
 		//		});
-		Graph<Integer, Integer> graph = new Graph<>(10);
-		for (int i = 0; i < graph.size(); i++) {
-			graph.setData(i, i);
-		}
-		graph.addEdge(0, 1, 1);
-		graph.addEdge(1, 2, 2);
-		graph.addEdge(1, 4, 3);
-		graph.addEdge(1, 8, 4);
-		graph.addEdge(2, 3, 5);
-		graph.addEdge(2, 6, 6);
-		graph.addEdge(2, 9, 7);
-		//		var BFSTree = graph.BFS(0);
-		//		BFSTree.aheadIter((data, depth) -> {
+		//		Graph<Integer, Integer> graph = new Graph<>(10);
+		//		for (int i = 0; i < graph.size(); i++) {
+		//			graph.setData(i, i);
+		//		}
+		//		graph.addEdge(0, 1, 1);
+		//		graph.addEdge(1, 2, 2);
+		//		graph.addEdge(1, 4, 3);
+		//		graph.addEdge(1, 8, 4);
+		//		graph.addEdge(2, 3, 5);
+		//		graph.addEdge(2, 6, 6);
+		//		graph.addEdge(2, 9, 7);
+		//		//		var BFSTree = graph.BFS(0);
+		//		//		BFSTree.aheadIter((data, depth) -> {
+		//		//			System.out.println(indent(depth) + data);
+		//		//		});
+		//		var DFSTree = graph.DFSV2(0);
+		//		DFSTree.afterIter((data, depth) -> {
 		//			System.out.println(indent(depth) + data);
 		//		});
-		var DFSTree = graph.DFSV2(0);
-		DFSTree.afterIter((data, depth) -> {
-			System.out.println(indent(depth) + data);
-		});
 		//		SequentList<Integer> bigDecimalList = new SequentList<>();
 		//		bigDecimalList.addAll(new Integer[] { 1, 2, 3, 4, 5, 15, 2, 10, 9 });
 		//		bigDecimalList.addAll(2, new Integer[] { 6, 7, 2, 8, 12 });
